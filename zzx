@@ -1,0 +1,83 @@
+#include <iostream>
+#include <fstream>
+#include <cmath>
+
+using namespace std;
+float const pi = 3.141592;
+float dy = 0.05;
+float dx = 0.05;
+float psi = 0.007;
+float desy = 0.5;
+float desx = 0.5;
+float xi, yi;
+float eead2;
+int c=0;
+
+
+float fxyF (float x, float y)
+{
+	float fxyF = (sin(2 * pi * x) * sin(4 * pi * y));
+	return fxyF;
+}
+float dfxydx(float x, float y,float dk)
+{
+	float result = ((fxyF(x + dk, y) - fxyF(x, y)) / dk);
+	return result;
+}
+float dfxydy(float x, float y, float dk)
+{
+	float result = ((fxyF(x, y + dk) - fxyF(x, y)) / dk);
+	return result;
+}
+float eead(float desx, float desy,float xi,float yi)
+{
+	float distance = sqrt(((desx - xi) * (desx - xi)) + ((desy - yi) * (desy - yi)));
+	return distance;
+}
+
+int main()
+{
+	ofstream fxyout;
+
+	fxyout.open("fxy.txt");
+	fxyout << "\t";
+	for (float x = 0; x < 1; x=x+dx)
+	{
+		fxyout << x << "\t";
+	}
+	fxyout << "\n";
+	for (float y = 0.; y < 1; y = y + dy)
+	{
+		fxyout << y << "\t";
+		for (float x = 0.; x < 1; x = x + dx)
+		{
+			fxyout << fxyF(x, y) << "\t";
+		}
+		fxyout << "\n";
+	}
+	fxyout.close();
+
+	cout << fxyF(0.25, 0.125) << "\t" << fxyF(0.25, (0.75 / 2)) << "\t" << fxyF(0.75, 0.125) << "\t" << fxyF(0.75, (0.75 / 2))<<endl;
+
+	for (int i = 0; i < 200; i++)
+	{
+		xi = desx;
+		yi = desy;
+		
+		desx += (psi * dfxydx(xi, yi, 0.0001));
+		desy += (psi * dfxydy(xi, yi, 0.0001));
+		cout <<"\neea is : " <<eead(desx, desy, xi, yi)<<"\n";
+		cout<<desx << "\t"<<desy<<endl;
+
+		if (eead2 == eead(desx, desy, xi, yi))
+		{
+			i = i+100;
+			desx += 0.01;
+			desy += 0.01;
+		}
+		eead2 = eead(desx, desy, xi, yi);
+		c = c + 1;
+		
+	}
+	cout <<"\nC is : \n"<<c<<"\n--------Assign2_3-----\n" <<desx<<"\n"<<desy<<"\n fxy :  "<<fxyF(desx,desy);
+}
